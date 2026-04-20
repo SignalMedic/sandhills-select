@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-brand-red: #C8102E;
+  --color-brand-navy: #071D49;
+  --color-brand-navy-light: #0f2d6b;
+  --color-brand-gray: #f4f4f5;
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-oswald);
+}
+
+body {
+  background: #ffffff;
+  color: #111111;
+}
