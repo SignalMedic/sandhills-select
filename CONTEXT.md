@@ -154,10 +154,42 @@ All tables are in the `public` schema with RLS enabled. Migration file: `supabas
 
 ---
 
+## What's Built (continued)
+
+### Public Pages
+- `/teams` — active teams with head coach, queries `teams` + `coach_teams` + `profiles`
+- `/schedule` — upcoming entries grouped by date, queries `schedule_entries`
+- `/events` — published events split into upcoming/past, register CTA when open
+- `/news` — published announcements reverse chronological
+- `/highlights` — approved coach highlights (photo/video/text)
+- `/contact` — server action form routing to org or specific team, inserts into `messages`
+
+### Authentication
+- `/login` — email/password, role-based redirect (admin → `/admin`, coach → `/coach`)
+- Middleware — refreshes session every request, protects `/admin` and `/coach` routes
+- Auth trigger — `handle_new_user()` auto-creates `profiles` row on user signup
+- `requireAdmin()` / `requireCoach()` helpers used in dashboard layouts
+- Route groups: `(public)` has Navbar/Footer; `admin` and `coach` have sidebar layouts
+
+### Admin Dashboard (shell)
+- `/admin` — stats: pending reimbursements, pending highlights, unread messages; quick actions
+- Sidebar nav: Dashboard, Announcements, Events, Schedule, Teams, Reimbursements, Highlights, Messages
+
+### Coach Dashboard (shell)
+- `/coach` — upcoming schedule, recent reimbursements with status, recent highlights
+- Sidebar nav: Dashboard, My Schedule, Roster, Submit Receipt, Reimbursements, Post Highlight, Messages
+
+### Notes
+- First admin user must be created manually via Supabase Auth dashboard
+- Profile must be inserted manually for users created before the trigger was applied
+- To create coaches: use Supabase Auth dashboard → Add user (trigger auto-creates profile with coach role)
+
+---
+
 ## What's Next (in order)
 
-1. **Public pages** — Teams (`/teams`), Schedule (`/schedule`), Events (`/events`), News (`/news`), Contact (`/contact`), Highlights (`/highlights`)
-2. **Authentication** — Supabase Auth login/signup for admins and coaches
+1. ~~**Public pages**~~ ✓
+2. ~~**Authentication**~~ ✓
 3. **Admin dashboard** — announcements, events, schedules, reimbursement approvals, team management
 4. **Coach dashboard** — receipt submission, highlights submission, messages
 5. **Mobile app** — React Native + Expo companion app for coaches
