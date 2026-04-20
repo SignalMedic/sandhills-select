@@ -2,15 +2,16 @@ import { requireCoach } from "@/lib/supabase/auth";
 import { signOut } from "@/lib/supabase/auth";
 import Image from "next/image";
 import Link from "next/link";
+import MobileNav from "@/components/MobileNav";
 
 const navItems = [
   { label: "Dashboard", href: "/coach" },
   { label: "My Schedule", href: "/coach/schedule" },
   { label: "Roster", href: "/coach/roster" },
-  { label: "Submit Receipt", href: "/coach/receipts/new" },
   { label: "Reimbursements", href: "/coach/reimbursements" },
   { label: "Post Highlight", href: "/coach/highlights/new" },
   { label: "Messages", href: "/coach/messages" },
+  { label: "Contacts", href: "/coach/contact" },
 ];
 
 export default async function CoachLayout({
@@ -21,8 +22,19 @@ export default async function CoachLayout({
   const profile = await requireCoach();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <aside className="w-64 bg-brand-navy text-white flex flex-col shrink-0">
+    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
+      {/* Mobile top bar + drawer */}
+      <MobileNav
+        navItems={navItems}
+        portalLabel="Coach Portal"
+        homeHref="/coach"
+        userName={profile.full_name ?? ""}
+        userEmail={profile.email ?? ""}
+        signOutAction={signOut}
+      />
+
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex w-64 bg-brand-navy text-white flex-col shrink-0">
         <div className="p-6 border-b border-brand-navy-light">
           <Link href="/coach" className="flex items-center gap-3">
             <Image
@@ -70,7 +82,8 @@ export default async function CoachLayout({
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto">{children}</main>
+      {/* Main content */}
+      <main className="flex-1 overflow-auto min-w-0">{children}</main>
     </div>
   );
 }

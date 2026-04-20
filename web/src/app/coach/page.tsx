@@ -48,7 +48,7 @@ export default async function CoachDashboard() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 lg:p-8">
       <div className="mb-8">
         <h1 className="font-display font-bold text-brand-navy text-3xl uppercase">
           Welcome, {profile.full_name.split(" ")[0]}

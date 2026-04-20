@@ -4,6 +4,8 @@ import Link from "next/link";
 
 export const metadata = { title: "Events — Sandhills Select Baseball" };
 
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
 function formatDateRange(start: string, end: string) {
   const s = new Date(start);
   const e = new Date(end);
@@ -15,6 +17,34 @@ function formatDateRange(start: string, end: string) {
     return `${s.toLocaleDateString("en-US", opts)} – ${e.toLocaleDateString("en-US", { ...opts, year: "numeric" })}`;
   }
   return `${s.toLocaleDateString("en-US", { month: "long", day: "numeric" })}–${e.getDate()}, ${e.getFullYear()}`;
+}
+
+function formatTime(t: string | null | undefined) {
+  if (!t) return null;
+  const [h, m] = t.slice(0, 5).split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
+}
+
+function formatRecurringSchedule(
+  recurrenceDays: number[] | null,
+  recurrenceTime: string | null,
+  recurrenceEndTime: string | null,
+  start: string,
+  end: string
+) {
+  const dayStr = recurrenceDays && recurrenceDays.length > 0
+    ? "Every " + recurrenceDays.map((d) => DAY_NAMES[d]).join(" & ")
+    : null;
+  const dateRange = formatDateRange(start, end);
+  const startTime = formatTime(recurrenceTime);
+  const endTime = formatTime(recurrenceEndTime);
+  const timeStr = startTime && endTime
+    ? `${startTime} – ${endTime}`
+    : startTime ?? null;
+
+  return [dayStr, dateRange, timeStr].filter(Boolean).join(" · ");
 }
 
 function formatPrice(cents: number) {
@@ -76,9 +106,11 @@ export default async function EventsPage() {
                               <div className="grid sm:grid-cols-2 gap-x-8 gap-y-1 text-sm text-gray-600 mb-3">
                                 <p>
                                   <span className="font-semibold text-gray-800">
-                                    Dates:
+                                    {event.is_recurring ? "Schedule:" : "Dates:"}
                                   </span>{" "}
-                                  {formatDateRange(event.start_date, event.end_date)}
+                                  {event.is_recurring
+                                    ? formatRecurringSchedule(event.recurrence_days, event.recurrence_time, event.recurrence_end_time, event.start_date, event.end_date)
+                                    : formatDateRange(event.start_date, event.end_date)}
                                 </p>
                                 <p>
                                   <span className="font-semibold text-gray-800">
@@ -146,7 +178,9 @@ export default async function EventsPage() {
                           </span>
                           <span className="mx-3 text-gray-300">·</span>
                           <span className="text-sm">
-                            {formatDateRange(event.start_date, event.end_date)}
+                            {event.is_recurring
+                              ? formatRecurringSchedule(event.recurrence_days, event.recurrence_time, event.recurrence_end_time, event.start_date, event.end_date)
+                              : formatDateRange(event.start_date, event.end_date)}
                           </span>
                           <span className="mx-3 text-gray-300">·</span>
                           <span className="text-sm">{event.location}</span>

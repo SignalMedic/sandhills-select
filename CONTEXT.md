@@ -34,7 +34,7 @@ A website and companion mobile app for **Sandhills Select Baseball**, a non-prof
 | Web framework | Next.js 16 (App Router) |
 | Styling | Tailwind CSS v4 |
 | Database | Supabase (Postgres) |
-| Auth | Supabase Auth (to be wired up) |
+| Auth | Supabase Auth |
 | CMS | Sanity (not yet set up) |
 | Mobile app | React Native + Expo (not yet started) |
 | Payments | Stripe + Stripe Connect (not yet set up) |
@@ -48,29 +48,93 @@ A website and companion mobile app for **Sandhills Select Baseball**, a non-prof
 
 ```
 SandhillsSelectWebsite/
-├── ROADMAP.md                          # Full feature list with numbered items (1.1–5.10)
+├── ROADMAP.md
 ├── CONTEXT.md                          # This file
 ├── supabase/
-│   ├── config.toml                     # Supabase CLI config, linked to remote project
+│   ├── config.toml
 │   └── migrations/
-│       └── 20260419_initial_schema.sql # Full database schema (already applied)
-└── web/                                # Next.js web app
+│       ├── 20260419_initial_schema.sql # Full DB schema (applied)
+│       └── 20260420_auth_trigger.sql   # handle_new_user() trigger (applied)
+└── web/
     ├── public/
-    │   ├── logo.png                    # Org logo (background removed)
-    │   └── logo.svg                    # SVG fallback (can be deleted)
-    ├── src/
-    │   ├── app/
-    │   │   ├── globals.css             # Tailwind v4 config + brand colors
-    │   │   ├── layout.tsx              # Root layout with Navbar + Footer
-    │   │   └── page.tsx                # Homepage
-    │   ├── components/
-    │   │   ├── Navbar.tsx              # Sticky navy navbar, mobile hamburger menu
-    │   │   └── Footer.tsx              # Navy footer with links
-    │   └── lib/
-    │       └── supabase/
-    │           ├── client.ts           # Browser-side Supabase client
-    │           └── server.ts           # Server-side Supabase client (RSC)
-    └── .env.local                      # Supabase credentials (gitignored)
+    │   └── logo.png                    # Org logo (background removed)
+    └── src/
+        ├── proxy.ts                    # Session refresh + route protection (Next.js 16 renamed from middleware.ts)
+        ├── app/
+        │   ├── globals.css             # Tailwind v4 config + brand colors
+        │   ├── layout.tsx              # Root layout (html/body/fonts only)
+        │   ├── (public)/               # Route group: Navbar + Footer
+        │   │   ├── layout.tsx
+        │   │   ├── page.tsx            # Homepage
+        │   │   ├── teams/page.tsx
+        │   │   ├── schedule/page.tsx
+        │   │   ├── events/page.tsx
+        │   │   ├── news/page.tsx
+        │   │   ├── highlights/page.tsx
+        │   │   └── contact/
+        │   │       ├── page.tsx
+        │   │       ├── ContactForm.tsx
+        │   │       └── actions.ts
+        │   ├── login/
+        │   │   ├── page.tsx
+        │   │   └── actions.ts
+        │   ├── admin/
+        │   │   ├── layout.tsx          # Sidebar nav, requireAdmin()
+        │   │   ├── page.tsx            # Dashboard: stats + quick actions
+        │   │   ├── announcements/
+        │   │   │   ├── page.tsx        # List (draft/published)
+        │   │   │   ├── AnnouncementForm.tsx
+        │   │   │   ├── actions.ts      # create, update, togglePublish, delete
+        │   │   │   ├── new/page.tsx
+        │   │   │   └── [id]/page.tsx   # Edit + publish/unpublish + delete
+        │   │   ├── events/
+        │   │   │   ├── page.tsx        # List with status + registration badges
+        │   │   │   ├── EventForm.tsx
+        │   │   │   ├── actions.ts      # create, update, togglePublish, toggleRegistration, delete
+        │   │   │   ├── new/page.tsx
+        │   │   │   └── [id]/page.tsx   # Edit + registrations list
+        │   │   ├── schedule/
+        │   │   │   ├── page.tsx        # All entries grouped by date, delete per entry
+        │   │   │   ├── ScheduleForm.tsx
+        │   │   │   ├── actions.ts      # create, delete
+        │   │   │   └── new/page.tsx
+        │   │   ├── teams/
+        │   │   │   ├── page.tsx        # List with head coach + player count
+        │   │   │   ├── TeamForm.tsx
+        │   │   │   ├── actions.ts      # create, update, toggleActive, assignCoach, removeCoach, addPlayer, removePlayer
+        │   │   │   ├── new/page.tsx
+        │   │   │   └── [id]/
+        │   │   │       ├── page.tsx    # Edit team + manage coaches + manage roster
+        │   │   │       └── InlineForm.tsx
+        │   │   ├── reimbursements/
+        │   │   │   ├── page.tsx        # List with status tabs (pending/under_review/approved/paid/denied)
+        │   │   │   ├── actions.ts      # updateReimbursementStatus
+        │   │   │   └── [id]/
+        │   │   │       ├── page.tsx    # Detail: receipts list + status update form
+        │   │   │       └── StatusForm.tsx
+        │   │   ├── highlights/
+        │   │   │   ├── page.tsx        # List with status tabs (pending/approved/rejected)
+        │   │   │   ├── actions.ts      # approveHighlight, rejectHighlight
+        │   │   │   └── [id]/
+        │   │   │       ├── page.tsx    # Detail: preview + approve/reject
+        │   │   │       └── RejectForm.tsx
+        │   │   └── messages/
+        │   │       ├── page.tsx        # Inbox with unread filter, unread highlighted blue
+        │   │       ├── actions.ts      # markMessageRead
+        │   │       └── [id]/page.tsx   # Full message, auto-marks read, reply via email link
+        │   ├── coach/
+        │   │   ├── layout.tsx          # Sidebar nav, requireCoach()
+        │   │   └── page.tsx            # Dashboard: upcoming schedule, reimbursements, highlights
+        │   └── auth/callback/          # Supabase auth callback handler
+        ├── components/
+        │   ├── Navbar.tsx
+        │   ├── Footer.tsx
+        │   └── DeleteButton.tsx        # Reusable confirm-before-delete client component
+        └── lib/
+            └── supabase/
+                ├── client.ts           # Browser Supabase client
+                ├── server.ts           # Server Supabase client (RSC/actions)
+                └── auth.ts             # getCurrentProfile, requireAdmin, requireCoach, signOut
 ```
 
 ---
@@ -131,58 +195,42 @@ All tables are in the `public` schema with RLS enabled. Migration file: `supabas
 
 ## What's Built
 
-### Homepage (`web/src/app/page.tsx`)
-- Hero section — navy background, logo, headline, two CTAs
-- Announcements section — 3-column card grid (placeholder data)
-- Upcoming Events section — cards with red accent stripe (placeholder data)
-- Teams section — 4 team cards (placeholder data)
-- CTA strip — red background, register/contact buttons
-
-### Navbar (`web/src/components/Navbar.tsx`)
-- Sticky, navy background
-- Logo + "Sandhills Select Baseball" wordmark
-- Links: Teams, Schedule, Events, News, Highlights, Contact
-- Red "Register" CTA button
-- Mobile hamburger menu
-
-### Footer (`web/src/components/Footer.tsx`)
-- Navy background
-- Logo + org description
-- Quick links column
-- Contact column
-- Copyright line
-
----
-
-## What's Built (continued)
-
-### Public Pages
-- `/teams` — active teams with head coach, queries `teams` + `coach_teams` + `profiles`
-- `/schedule` — upcoming entries grouped by date, queries `schedule_entries`
-- `/events` — published events split into upcoming/past, register CTA when open
+### Public Site
+- **Homepage** — hero, announcements preview, upcoming events, teams grid, CTA strip
+- **Navbar** — sticky navy, logo, nav links, red Register CTA, mobile hamburger
+- **Footer** — navy, logo, quick links, contact info
+- `/teams` — active teams with head coach, queries live DB
+- `/schedule` — upcoming entries grouped by date
+- `/events` — published events split upcoming/past, register CTA when open
 - `/news` — published announcements reverse chronological
 - `/highlights` — approved coach highlights (photo/video/text)
-- `/contact` — server action form routing to org or specific team, inserts into `messages`
+- `/contact` — form routing to org or specific team, inserts into `messages`
 
 ### Authentication
-- `/login` — email/password, role-based redirect (admin → `/admin`, coach → `/coach`)
-- Middleware — refreshes session every request, protects `/admin` and `/coach` routes
-- Auth trigger — `handle_new_user()` auto-creates `profiles` row on user signup
-- `requireAdmin()` / `requireCoach()` helpers used in dashboard layouts
+- `/login` — email/password, redirects admin → `/admin`, coach → `/coach`
+- `proxy.ts` — session refresh every request, protects `/admin` and `/coach` routes
+- Auth trigger — `handle_new_user()` auto-creates `profiles` row on signup
+- `requireAdmin()` / `requireCoach()` server helpers
 - Route groups: `(public)` has Navbar/Footer; `admin` and `coach` have sidebar layouts
 
-### Admin Dashboard (shell)
-- `/admin` — stats: pending reimbursements, pending highlights, unread messages; quick actions
-- Sidebar nav: Dashboard, Announcements, Events, Schedule, Teams, Reimbursements, Highlights, Messages
+### Admin Dashboard (complete)
+- `/admin` — stats cards (pending reimbursements, pending highlights, unread messages), quick actions
+- `/admin/announcements` — list, create draft, edit, publish/unpublish, delete
+- `/admin/events` — list, create, edit, publish/unpublish, open/close registration, delete, view registrations
+- `/admin/schedule` — all entries across all teams grouped by date, add entry (select team + type), delete
+- `/admin/teams` — list, create, manage page: edit details, assign coaches by email, add/remove players
+- `/admin/reimbursements` — tabbed by status, detail view with full receipt list, approve/deny/status update
+- `/admin/highlights` — tabbed by status, detail view with media preview, approve/reject with reason
+- `/admin/messages` — inbox with unread filter, detail auto-marks read, reply via email link
 
-### Coach Dashboard (shell)
-- `/coach` — upcoming schedule, recent reimbursements with status, recent highlights
-- Sidebar nav: Dashboard, My Schedule, Roster, Submit Receipt, Reimbursements, Post Highlight, Messages
+### Coach Dashboard (shell only — pages not yet built)
+- `/coach` — dashboard: upcoming schedule, recent reimbursements, recent highlights
+- Sidebar links to pages not yet built: My Schedule, Roster, Submit Receipt, Reimbursements, Post Highlight, Messages
 
 ### Notes
-- First admin user must be created manually via Supabase Auth dashboard
-- Profile must be inserted manually for users created before the trigger was applied
-- To create coaches: use Supabase Auth dashboard → Add user (trigger auto-creates profile with coach role)
+- First admin user must be created manually via Supabase Auth dashboard + manual profile insert
+- To create coaches: Supabase Auth dashboard → Add user (trigger auto-creates profile with `coach` role)
+- `DeleteButton.tsx` is a shared reusable client component for confirm-before-delete across admin pages
 
 ---
 
@@ -190,10 +238,10 @@ All tables are in the `public` schema with RLS enabled. Migration file: `supabas
 
 1. ~~**Public pages**~~ ✓
 2. ~~**Authentication**~~ ✓
-3. **Admin dashboard** — announcements, events, schedules, reimbursement approvals, team management
-4. **Coach dashboard** — receipt submission, highlights submission, messages
-5. **Mobile app** — React Native + Expo companion app for coaches
-6. **Vercel deployment** — connect repo, set env vars, go live
+3. ~~**Admin dashboard**~~ ✓
+4. **Coach dashboard** — submit receipts, reimbursement history, post highlights, view messages, view schedule, view roster
+5. **Vercel deployment** — connect repo, set env vars, go live
+6. **Mobile app** — React Native + Expo companion app for coaches
 7. **Integrations** — Stripe, Sanity CMS, Mux video, Resend email, social media APIs
 
 ---
@@ -205,4 +253,4 @@ All tables are in the `public` schema with RLS enabled. Migration file: `supabas
 - **Supabase over Firebase:** Postgres is portable; Firebase's NoSQL is not. Abstraction layers on auth/storage protect against lock-in
 - **Next.js + React Native:** Same TypeScript/React knowledge applies to both web and mobile
 - **RLS enabled at DB level:** Security enforced in the database, not just in application code
-- **SVG logo preferred:** Scales perfectly, supports transparency — replace `logo.png` with a proper transparent SVG when available
+- **proxy.ts (formerly middleware.ts):** Next.js 16 renamed the file convention; functionality identical

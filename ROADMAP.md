@@ -151,3 +151,4 @@ Because this involves minors, admin review before any public or social post is s
 - **5.8** Role-gated CMS Access — admins can publish; coaches have read-only or limited access
 - **5.9** Social Media API Integrations — Meta Graph API (Facebook + Instagram), X API; OAuth-based account connection managed by super-admin
 - **5.10** Video Storage & Transcoding — uploaded highlight videos need compression and format conversion before web and social delivery (recommend Cloudflare Stream or Mux)
+- **5.11** Transactional Email (SMTP) — current Supabase auth emails (invites, password reset) use Supabase's default sender which has low deliverability and no branding; integrate a dedicated SMTP provider (recommended: Resend or Postmark) for all transactional email — invites, password resets, reimbursement status updates, and announcement blasts; configure custom domain sending (e.g., noreply@sandhillsselect.com)
