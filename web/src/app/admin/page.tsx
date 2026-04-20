@@ -15,7 +15,7 @@ export default async function AdminDashboard() {
     supabase
       .from("reimbursement_requests")
       .select("*", { count: "exact", head: true })
-      .eq("status", "pending"),
+      .eq("status", "under_review"),
     supabase
       .from("highlights")
       .select("*", { count: "exact", head: true })
@@ -27,7 +27,7 @@ export default async function AdminDashboard() {
   ]);
 
   const stats = [
-    { label: "Pending Reimbursements", value: pendingReimbursements ?? 0, href: "/admin/reimbursements", urgent: (pendingReimbursements ?? 0) > 0 },
+    { label: "Pending Reimbursements", value: pendingReimbursements ?? 0, href: "/admin/reimbursements?status=under_review", urgent: (pendingReimbursements ?? 0) > 0 },
     { label: "Highlights to Review", value: pendingHighlights ?? 0, href: "/admin/highlights", urgent: (pendingHighlights ?? 0) > 0 },
     { label: "Unread Messages", value: unreadMessages ?? 0, href: "/admin/messages", urgent: (unreadMessages ?? 0) > 0 },
   ];

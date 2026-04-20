@@ -15,11 +15,10 @@ async function assertCoachOwnsTeam(coachId: string, teamId: string) {
   if (!data) throw new Error('Not authorized for this team.')
 }
 
-export async function addPlayer(_prev: string | null, formData: FormData): Promise<string | null> {
+export async function addPlayer(teamId: string, _prev: string | null, formData: FormData): Promise<string | null> {
   const profile = await requireCoach()
   const supabase = await createClient()
 
-  const teamId = formData.get('team_id') as string
   await assertCoachOwnsTeam(profile.id, teamId)
 
   const { error } = await supabase.from('players').insert({

@@ -4,16 +4,22 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import DeleteButton from '@/components/DeleteButton'
 import AddReceiptForm from './AddReceiptForm'
-import { addReceipt, removeReceipt, submitReimbursementRequest } from '../actions'
+import { addReceipt, removeReceipt, resubmitReimbursementRequest } from '../actions'
 
 export const metadata = { title: 'Reimbursement Request — Coach Portal' }
 
 const statusColor: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  under_review: 'bg-blue-100 text-blue-800',
+  under_review: 'bg-yellow-100 text-yellow-800',
   approved: 'bg-green-100 text-green-800',
   paid: 'bg-green-100 text-green-800',
   denied: 'bg-red-100 text-red-800',
+}
+
+const statusLabel: Record<string, string> = {
+  under_review: 'Awaiting Review',
+  approved: 'Approved',
+  paid: 'Paid',
+  denied: 'Denied',
 }
 
 export default async function CoachReimbursementDetailPage({
@@ -43,10 +49,11 @@ export default async function CoachReimbursementDetailPage({
   if (!req) notFound()
 
   const team = req.teams as unknown as { name: string } | null
-  const isPending = req.status === 'pending'
+  const isEditable = ['pending', 'under_review', 'denied'].includes(req.status)
+  const isDenied = req.status === 'denied'
 
   const boundAddReceipt = addReceipt.bind(null, id)
-  const submitAction = submitReimbursementRequest.bind(null, id)
+  const boundResubmit = resubmitReimbursementRequest.bind(null, id)
 
   return (
     <div className="p-8 max-w-2xl space-y-8">
@@ -58,7 +65,7 @@ export default async function CoachReimbursementDetailPage({
           ← Reimbursements
         </Link>
         <span className={`text-xs font-display font-bold uppercase px-2 py-0.5 rounded ${statusColor[req.status] ?? ''}`}>
-          {req.status.replace('_', ' ')}
+          {statusLabel[req.status] ?? req.status.replace('_', ' ')}
         </span>
       </div>
 
@@ -83,7 +90,7 @@ export default async function CoachReimbursementDetailPage({
             Receipts ({receipts?.length ?? 0})
           </h2>
           <p className="font-display font-bold text-brand-navy text-lg">
-            Total: ${((req.total_amount_cents ?? 0) / 100).toFixed(2)}
+            Total: ${((receipts ?? []).reduce((sum, r) => sum + r.amount_cents, 0) / 100).toFixed(2)}
           </p>
         </div>
 
@@ -105,7 +112,7 @@ export default async function CoachReimbursementDetailPage({
                   <p className="text-sm font-bold text-brand-navy shrink-0">
                     ${(r.amount_cents / 100).toFixed(2)}
                   </p>
-                  {isPending && (
+                  {isEditable && (
                     <DeleteButton action={removeAction} label="Remove" confirmMessage="Remove this receipt?" />
                   )}
                 </div>
@@ -114,7 +121,7 @@ export default async function CoachReimbursementDetailPage({
           </div>
         )}
 
-        {isPending && (
+        {isEditable && (
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-5">
             <p className="text-xs font-display font-bold uppercase tracking-wider text-gray-500 mb-4">
               Add Receipt
@@ -124,22 +131,29 @@ export default async function CoachReimbursementDetailPage({
         )}
       </div>
 
-      {isPending && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h2 className="font-display font-bold text-brand-navy text-lg uppercase mb-2">Submit for Review</h2>
-          <p className="text-sm text-gray-500 mb-4">
-            Once submitted, you cannot add or remove receipts. An admin will review and approve or deny.
+      {isDenied && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-3">
+          <p className="text-xs font-display font-bold uppercase tracking-wider text-brand-navy">
+            Resubmit for Review
           </p>
-          <form action={submitAction}>
+          <p className="text-sm text-gray-500">
+            Update your receipts above, then resubmit this request. The admin will be notified to review it again.
+          </p>
+          <form action={boundResubmit}>
             <button
               type="submit"
-              disabled={(req.total_amount_cents ?? 0) === 0}
-              className="px-6 py-2 bg-brand-red text-white text-xs font-display font-bold uppercase tracking-wider rounded hover:bg-red-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-brand-navy text-white text-xs font-display font-bold uppercase tracking-wider rounded hover:bg-navy-800 transition-colors"
             >
-              Submit Request
+              Resubmit for Review →
             </button>
           </form>
         </div>
+      )}
+
+      {!isDenied && isEditable && (
+        <p className="text-xs text-gray-400">
+          You can add or remove receipts until an admin reviews this request.
+        </p>
       )}
     </div>
   )

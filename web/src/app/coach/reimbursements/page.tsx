@@ -18,7 +18,7 @@ export default async function CoachReimbursementsPage() {
 
   const { data: requests } = await supabase
     .from('reimbursement_requests')
-    .select('id, title, status, total_amount_cents, created_at, teams(name)')
+    .select('id, title, status, created_at, teams(name), receipts(amount_cents)')
     .eq('coach_id', profile.id)
     .order('created_at', { ascending: false })
 
@@ -55,7 +55,7 @@ export default async function CoachReimbursementsPage() {
                 <p className="font-semibold text-brand-navy text-sm">{r.title}</p>
                 <p className="text-xs text-gray-400 mt-0.5">
                   {(r.teams as unknown as { name: string } | null)?.name} ·{' '}
-                  ${((r.total_amount_cents ?? 0) / 100).toFixed(2)} ·{' '}
+                  ${((r.receipts as { amount_cents: number }[] | null ?? []).reduce((s, x) => s + x.amount_cents, 0) / 100).toFixed(2)} ·{' '}
                   {new Date(r.created_at).toLocaleDateString()}
                 </p>
               </div>
@@ -67,7 +67,7 @@ export default async function CoachReimbursementsPage() {
                   href={`/coach/reimbursements/${r.id}`}
                   className="text-xs font-display font-bold uppercase text-brand-navy hover:text-brand-red"
                 >
-                  {r.status === 'pending' ? 'Edit →' : 'View →'}
+                  {['pending', 'under_review', 'denied'].includes(r.status) ? 'Edit →' : 'View →'}
                 </Link>
               </div>
             </div>

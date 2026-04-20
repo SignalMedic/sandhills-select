@@ -24,13 +24,13 @@ export default async function HighlightDetailPage({
 
   const { data: h } = await supabase
     .from('highlights')
-    .select('*, profiles(full_name, email), teams(name)')
+    .select('*, profiles!coach_id(full_name, email), teams(name)')
     .eq('id', id)
     .single()
 
   if (!h) notFound()
 
-  const coach = h.profiles as { full_name: string; email: string } | null
+  const coach = (h as Record<string, unknown>)['profiles'] as { full_name: string; email: string } | null
   const team = h.teams as { name: string } | null
   const approveAction = approveHighlight.bind(null, id)
   const boundReject = rejectHighlight.bind(null, id)
@@ -76,24 +76,40 @@ export default async function HighlightDetailPage({
         </div>
 
         {h.media_url && (
-          <div>
+          <div className="sm:col-span-2">
             <p className="text-xs text-gray-400 uppercase font-bold mb-2">Media</p>
             {h.type === 'photo' ? (
               <img
                 src={h.media_url}
                 alt="Highlight"
-                className="rounded max-h-64 object-contain border border-gray-200"
+                className="rounded max-h-72 object-contain border border-gray-200"
               />
-            ) : (
-              <a
-                href={h.media_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-brand-red hover:underline"
-              >
-                View media →
-              </a>
-            )}
+            ) : h.type === 'video' ? (
+              (() => {
+                const ytId = h.media_url.match(
+                  /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]+)/
+                )?.[1]
+                return ytId ? (
+                  <div className="aspect-video rounded overflow-hidden border border-gray-200">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${ytId}`}
+                      className="w-full h-full"
+                      allowFullScreen
+                      title="Highlight video"
+                    />
+                  </div>
+                ) : (
+                  <a
+                    href={h.media_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-brand-red hover:underline"
+                  >
+                    View video →
+                  </a>
+                )
+              })()
+            ) : null}
           </div>
         )}
 
@@ -107,13 +123,14 @@ export default async function HighlightDetailPage({
 
       {h.status !== 'approved' && (
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h2 className="font-display font-bold text-brand-navy text-lg uppercase mb-4">Approve</h2>
+          <h2 className="font-display font-bold text-brand-navy text-lg uppercase mb-2">Approve</h2>
+          <p className="text-xs text-gray-400 mb-4">Approving will create a draft announcement pre-filled with this highlight's content for you to review and publish.</p>
           <form action={approveAction}>
             <button
               type="submit"
               className="px-5 py-2 bg-green-600 text-white text-xs font-display font-bold uppercase tracking-wider rounded hover:bg-green-700 transition-colors"
             >
-              Approve &amp; Publish
+              Approve → Create Announcement Draft
             </button>
           </form>
         </div>

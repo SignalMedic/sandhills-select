@@ -4,6 +4,12 @@ import { useActionState, useState } from 'react'
 
 type ActionFn = (prev: string | null, formData: FormData) => Promise<string | null>
 
+function getYouTubeId(url: string): string | null {
+  return url.match(
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]+)/
+  )?.[1] ?? null
+}
+
 export default function HighlightForm({
   action,
   teams,
@@ -13,6 +19,18 @@ export default function HighlightForm({
 }) {
   const [error, formAction, isPending] = useActionState(action, null)
   const [type, setType] = useState('text')
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [videoUrl, setVideoUrl] = useState('')
+
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (photoPreview) URL.revokeObjectURL(photoPreview)
+      setPhotoPreview(URL.createObjectURL(file))
+    }
+  }
+
+  const ytId = type === 'video' ? getYouTubeId(videoUrl) : null
 
   return (
     <form action={formAction} className="space-y-5 max-w-lg">
@@ -55,7 +73,7 @@ export default function HighlightForm({
                 name="type"
                 value={t}
                 checked={type === t}
-                onChange={() => setType(t)}
+                onChange={() => { setType(t); setPhotoPreview(null); setVideoUrl('') }}
                 className="sr-only"
               />
               {t}
@@ -77,17 +95,56 @@ export default function HighlightForm({
         />
       </div>
 
-      {(type === 'photo' || type === 'video') && (
+      {type === 'photo' && (
         <div>
           <label className="block text-xs font-display font-bold uppercase tracking-wider text-gray-700 mb-2">
-            Media URL <span className="normal-case font-normal text-gray-400">(link to photo or video)</span>
+            Photo <span className="normal-case font-normal text-gray-400">(JPEG, PNG, WebP — max 10 MB)</span>
+          </label>
+          <input
+            type="file"
+            name="photo"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            required
+            onChange={handlePhotoChange}
+            className="w-full text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-display file:font-bold file:uppercase file:tracking-wider file:bg-brand-navy file:text-white hover:file:bg-brand-navy-light"
+          />
+          {photoPreview && (
+            <img
+              src={photoPreview}
+              alt="Preview"
+              className="mt-3 rounded max-h-56 object-contain border border-gray-200"
+            />
+          )}
+        </div>
+      )}
+
+      {type === 'video' && (
+        <div>
+          <label className="block text-xs font-display font-bold uppercase tracking-wider text-gray-700 mb-2">
+            Video URL <span className="normal-case font-normal text-gray-400">(YouTube link)</span>
           </label>
           <input
             name="media_url"
             type="url"
-            placeholder="https://…"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            required
+            placeholder="https://www.youtube.com/watch?v=…"
             className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy"
           />
+          {videoUrl && !ytId && (
+            <p className="mt-1 text-xs text-amber-600">Paste a YouTube link to see a preview.</p>
+          )}
+          {ytId && (
+            <div className="mt-3 aspect-video rounded overflow-hidden border border-gray-200">
+              <iframe
+                src={`https://www.youtube.com/embed/${ytId}`}
+                className="w-full h-full"
+                allowFullScreen
+                title="Video preview"
+              />
+            </div>
+          )}
         </div>
       )}
 

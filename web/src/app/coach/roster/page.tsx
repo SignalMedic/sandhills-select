@@ -32,7 +32,7 @@ export default async function CoachRosterPage() {
     return acc
   }, {})
 
-  type Player = { id: string; full_name: string; jersey_number: string | null; position: string | null; email: string | null; phone: string | null }
+  type Player = { id: string; full_name: string; jersey_number: string | null; position: string | null; email: string | null; phone: string | null; editAction: (prev: string | null, formData: FormData) => Promise<string | null>; removeAction: () => Promise<void> }
 
   return (
     <div className="p-4 lg:p-8">
@@ -48,15 +48,11 @@ export default async function CoachRosterPage() {
             const team = ct.teams as unknown as { id: string; name: string; age_group: string; season: string } | null
             if (!team) return null
 
-            const roster = (playersByTeam[ct.team_id] ?? []) as unknown as Player[]
-
-            // Bind team_id into the add action via a hidden-field approach:
-            // We use a wrapper that injects team_id into the formData.
-            const boundAdd = async (prev: string | null, formData: FormData) => {
-              'use server'
-              formData.set('team_id', team.id)
-              return addPlayer(prev, formData)
-            }
+            const roster = (playersByTeam[ct.team_id] ?? []).map((p) => ({
+              ...(p as unknown as Omit<Player, 'editAction' | 'removeAction'>),
+              editAction: updatePlayer.bind(null, p.id, team.id),
+              removeAction: removePlayer.bind(null, p.id, team.id),
+            })) as Player[]
 
             return (
               <div key={ct.team_id}>
@@ -71,9 +67,7 @@ export default async function CoachRosterPage() {
                 </div>
                 <PlayerRoster
                   players={roster}
-                  addAction={boundAdd}
-                  makeEditAction={(playerId) => updatePlayer.bind(null, playerId, team.id)}
-                  makeRemoveAction={(playerId) => removePlayer.bind(null, playerId, team.id)}
+                  addAction={addPlayer.bind(null, team.id)}
                 />
               </div>
             )

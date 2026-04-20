@@ -25,7 +25,7 @@ export default async function HighlightsPage({
 
   const { data: highlights } = await supabase
     .from('highlights')
-    .select('id, caption, type, status, created_at, profiles(full_name), teams(name)')
+    .select('id, caption, type, status, created_at, profiles!coach_id(full_name), teams(name)')
     .eq('status', activeTab)
     .order('created_at', { ascending: false })
 
@@ -57,7 +57,7 @@ export default async function HighlightsPage({
         ) : (
           <div className="divide-y divide-gray-100">
             {highlights.map((h) => {
-              const coach = h.profiles as unknown as { full_name: string } | null
+              const coach = (h as Record<string, unknown>)['profiles'] as { full_name: string } | null
               const team = h.teams as unknown as { name: string } | null
               return (
                 <Link

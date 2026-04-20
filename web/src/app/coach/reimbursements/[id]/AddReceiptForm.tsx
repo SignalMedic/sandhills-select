@@ -77,6 +77,18 @@ export default function AddReceiptForm({
 
         <div className="sm:col-span-2">
           <label className="block text-xs font-display font-bold uppercase tracking-wider text-gray-700 mb-1">
+            Receipt File <span className="normal-case font-normal text-gray-400">(photo or PDF — max 10 MB)</span>
+          </label>
+          <input
+            type="file"
+            name="receipt_file"
+            accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
+            className="w-full text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-display file:font-bold file:uppercase file:tracking-wider file:bg-brand-navy file:text-white hover:file:bg-brand-navy-light"
+          />
+        </div>
+
+        <div className="sm:col-span-2">
+          <label className="block text-xs font-display font-bold uppercase tracking-wider text-gray-700 mb-1">
             Notes <span className="normal-case font-normal text-gray-400">(optional)</span>
           </label>
           <input

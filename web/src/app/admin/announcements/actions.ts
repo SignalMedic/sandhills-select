@@ -34,7 +34,24 @@ export async function updateAnnouncement(id: string, _prev: string | null, formD
 
   if (error) return error.message
   revalidatePath('/admin/announcements')
+  revalidatePath('/news')
   redirect('/admin/announcements')
+}
+
+export async function toggleAnnouncementPin(id: string, currentPinned: boolean): Promise<void> {
+  await requireAdmin()
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('announcements')
+    .update({ pinned: !currentPinned })
+    .eq('id', id)
+
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin/announcements')
+  revalidatePath(`/admin/announcements/${id}`)
+  revalidatePath('/news')
+  revalidatePath('/')
 }
 
 export async function toggleAnnouncementPublish(id: string, currentStatus: string): Promise<void> {
@@ -53,6 +70,8 @@ export async function toggleAnnouncementPublish(id: string, currentStatus: strin
   if (error) throw new Error(error.message)
   revalidatePath('/admin/announcements')
   revalidatePath(`/admin/announcements/${id}`)
+  revalidatePath('/news')
+  revalidatePath('/')
 }
 
 export async function deleteAnnouncement(id: string): Promise<void> {

@@ -3,10 +3,17 @@
 import { requireAdmin } from '@/lib/supabase/auth'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 export async function approveHighlight(id: string): Promise<void> {
   const profile = await requireAdmin()
   const supabase = await createClient()
+
+  const { data: highlight } = await supabase
+    .from('highlights')
+    .select('caption, type, media_url, teams!team_id(name)')
+    .eq('id', id)
+    .single()
 
   const { error } = await supabase
     .from('highlights')
@@ -19,8 +26,31 @@ export async function approveHighlight(id: string): Promise<void> {
     .eq('id', id)
 
   if (error) throw new Error(error.message)
+
+  const team = highlight?.teams as { name: string } | null
+  const typeLabel = highlight?.type === 'photo' ? 'Photo' : highlight?.type === 'video' ? 'Video' : 'Update'
+  const suggestedTitle = team ? `${team.name} — ${typeLabel}` : typeLabel
+
+  const { data: announcement } = await supabase
+    .from('announcements')
+    .insert({
+      title: suggestedTitle,
+      body: highlight?.caption ?? '',
+      author_id: profile.id,
+      status: 'draft',
+      media_url: highlight?.type === 'photo' ? (highlight?.media_url ?? null) : null,
+    })
+    .select('id')
+    .single()
+
   revalidatePath('/admin/highlights')
-  revalidatePath(`/admin/highlights/${id}`)
+  revalidatePath('/admin/announcements')
+
+  if (announcement) {
+    redirect(`/admin/announcements/${announcement.id}`)
+  } else {
+    redirect('/admin/highlights')
+  }
 }
 
 export async function rejectHighlight(id: string, _prev: string | null, formData: FormData): Promise<string | null> {

@@ -30,8 +30,9 @@ export default async function HomePage() {
   const [{ data: announcements }, { data: events }] = await Promise.all([
     supabase
       .from("announcements")
-      .select("id, title, body, published_at")
+      .select("id, title, body, published_at, pinned")
       .eq("status", "published")
+      .order("pinned", { ascending: false })
       .order("published_at", { ascending: false })
       .limit(3),
     supabase
@@ -112,20 +113,26 @@ export default async function HomePage() {
           {announcements && announcements.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {announcements.map((a) => (
-                <article
+                <Link
                   key={a.id}
-                  className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                  href={`/news/${a.id}`}
+                  className="block group"
                 >
-                  <p className="text-xs text-gray-400 font-display uppercase tracking-widest mb-2">
-                    {a.published_at ? formatDate(a.published_at) : ""}
-                  </p>
-                  <h3 className="font-display font-bold text-brand-navy text-lg uppercase leading-tight mb-3">
-                    {a.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                    {a.body}
-                  </p>
-                </article>
+                  <article className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow h-full flex flex-col">
+                    <p className="text-xs text-gray-400 font-display uppercase tracking-widest mb-2">
+                      {a.published_at ? formatDate(a.published_at) : ""}
+                    </p>
+                    <h3 className="font-display font-bold text-brand-navy text-lg uppercase leading-tight mb-3 group-hover:text-brand-red transition-colors">
+                      {a.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 flex-1">
+                      {a.body}
+                    </p>
+                    <p className="mt-4 text-xs font-display font-bold uppercase tracking-wider text-brand-red">
+                      Read More →
+                    </p>
+                  </article>
+                </Link>
               ))}
             </div>
           ) : (

@@ -38,7 +38,11 @@ export default async function TeamDetailPage({
   const boundAssignCoach = assignCoach.bind(null, id)
 
   type Player = { id: string; full_name: string; jersey_number: string | null; position: string | null; email: string | null; phone: string | null }
-  const roster = (players ?? []) as unknown as Player[]
+  const roster = (players ?? []).map((p) => ({
+    ...(p as unknown as Player),
+    editAction: updatePlayer.bind(null, p.id, id),
+    removeAction: removePlayer.bind(null, id, p.id),
+  }))
 
   return (
     <div className="p-4 lg:p-8 space-y-10">
@@ -106,8 +110,6 @@ export default async function TeamDetailPage({
         <PlayerRoster
           players={roster}
           addAction={addPlayer.bind(null, id)}
-          makeEditAction={(playerId) => updatePlayer.bind(null, playerId, id)}
-          makeRemoveAction={(playerId) => removePlayer.bind(null, id, playerId)}
         />
       </section>
     </div>

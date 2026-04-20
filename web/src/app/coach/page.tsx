@@ -12,7 +12,7 @@ export default async function CoachDashboard() {
     await Promise.all([
       supabase
         .from("reimbursement_requests")
-        .select("id, title, status, total_amount_cents, created_at")
+        .select("id, title, status, created_at, receipts(amount_cents)")
         .eq("coach_id", profile.id)
         .order("created_at", { ascending: false })
         .limit(5),
@@ -128,7 +128,7 @@ export default async function CoachDashboard() {
                   <div>
                     <p className="font-semibold text-brand-navy">{r.title}</p>
                     <p className="text-gray-400 text-xs">
-                      ${((r.total_amount_cents ?? 0) / 100).toFixed(2)}
+                      ${((r.receipts as { amount_cents: number }[] | null ?? []).reduce((s, x) => s + x.amount_cents, 0) / 100).toFixed(2)}
                     </p>
                   </div>
                   <span className={`text-xs font-display font-bold uppercase px-2 py-0.5 rounded ${statusColor[r.status] ?? ""}`}>

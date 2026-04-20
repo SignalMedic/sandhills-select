@@ -9,6 +9,8 @@ type Player = {
   position: string | null
   email: string | null
   phone: string | null
+  editAction: ActionFn
+  removeAction: () => Promise<void>
 }
 
 type ActionFn = (prev: string | null, formData: FormData) => Promise<string | null>
@@ -109,13 +111,9 @@ function AddRow({ addAction }: { addAction: ActionFn }) {
 export default function PlayerRoster({
   players,
   addAction,
-  makeEditAction,
-  makeRemoveAction,
 }: {
   players: Player[]
   addAction: ActionFn
-  makeEditAction: (playerId: string) => ActionFn
-  makeRemoveAction: (playerId: string) => () => Promise<void>
 }) {
   const [editingId, setEditingId] = useState<string | null>(null)
 
@@ -152,8 +150,8 @@ export default function PlayerRoster({
           {editingId === p.id && (
             <EditRow
               player={p}
-              editAction={makeEditAction(p.id)}
-              removeAction={makeRemoveAction(p.id)}
+              editAction={p.editAction}
+              removeAction={p.removeAction}
               onClose={() => setEditingId(null)}
             />
           )}

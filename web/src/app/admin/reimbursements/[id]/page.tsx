@@ -27,7 +27,7 @@ export default async function ReimbursementDetailPage({
   const [{ data: req }, { data: receipts }, { data: categories }] = await Promise.all([
     supabase
       .from('reimbursement_requests')
-      .select('*, profiles(full_name, email), teams(name)')
+      .select('*, profiles!coach_id(full_name, email), teams(name)')
       .eq('id', id)
       .single(),
     supabase
@@ -40,7 +40,7 @@ export default async function ReimbursementDetailPage({
 
   if (!req) notFound()
 
-  const coach = req.profiles as { full_name: string; email: string } | null
+  const coach = (req as Record<string, unknown>)['profiles'] as { full_name: string; email: string } | null
   const team = req.teams as { name: string } | null
   const boundUpdate = updateReimbursementStatus.bind(null, id)
 
@@ -72,7 +72,7 @@ export default async function ReimbursementDetailPage({
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase font-bold">Total</p>
-            <p className="text-brand-navy font-bold">${((req.total_amount_cents ?? 0) / 100).toFixed(2)}</p>
+            <p className="text-brand-navy font-bold">${((receipts ?? []).reduce((sum, r) => sum + r.amount_cents, 0) / 100).toFixed(2)}</p>
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase font-bold">Submitted</p>
@@ -100,35 +100,59 @@ export default async function ReimbursementDetailPage({
         {receipts && receipts.length > 0 ? (
           <div className="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100">
             {receipts.map((r) => (
-              <div key={r.id} className="px-5 py-4 flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-brand-navy">
-                    {r.merchant_name ?? 'Unknown Merchant'}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {(r.expense_categories as { name: string } | null)?.name} ·{' '}
-                    {new Date(r.expense_date).toLocaleDateString()}
-                  </p>
-                  {r.notes && <p className="text-xs text-gray-500 mt-1">{r.notes}</p>}
+              <div key={r.id} className="px-5 py-4 space-y-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-brand-navy">
+                      {r.merchant_name ?? 'Unknown Merchant'}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {(r.expense_categories as { name: string } | null)?.name} ·{' '}
+                      {new Date(r.expense_date).toLocaleDateString()}
+                    </p>
+                    {r.notes && <p className="text-xs text-gray-500 mt-1">{r.notes}</p>}
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-bold text-brand-navy">${(r.amount_cents / 100).toFixed(2)}</p>
+                    {r.image_url && (
+                      <a
+                        href={r.image_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-brand-red hover:underline"
+                      >
+                        {r.image_url.endsWith('.pdf') ? 'View PDF' : 'View full size'}
+                      </a>
+                    )}
+                  </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-sm font-bold text-brand-navy">${(r.amount_cents / 100).toFixed(2)}</p>
-                  {r.image_url && (
+                {r.image_url && !r.image_url.endsWith('.pdf') && (
+                  <a href={r.image_url} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={r.image_url}
+                      alt={`Receipt — ${r.merchant_name ?? 'unknown'}`}
+                      className="rounded border border-gray-200 max-h-48 object-contain hover:opacity-90 transition-opacity"
+                    />
+                  </a>
+                )}
+                {r.image_url && r.image_url.endsWith('.pdf') && (
+                  <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded px-3 py-2 w-fit">
+                    <span className="text-xs text-gray-500">PDF</span>
                     <a
                       href={r.image_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-brand-red hover:underline"
+                      className="text-xs font-display font-bold uppercase text-brand-red hover:underline"
                     >
-                      View receipt
+                      Open →
                     </a>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             ))}
             <div className="px-5 py-3 bg-gray-50 flex justify-end">
               <p className="text-sm font-bold text-brand-navy">
-                Total: ${((req.total_amount_cents ?? 0) / 100).toFixed(2)}
+                Total: ${((receipts ?? []).reduce((sum, r) => sum + r.amount_cents, 0) / 100).toFixed(2)}
               </p>
             </div>
           </div>
