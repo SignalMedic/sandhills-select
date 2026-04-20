@@ -4,10 +4,10 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PlayerRoster from '@/components/PlayerRoster'
 import DeleteButton from '@/components/DeleteButton'
-import { CoachAssignForm } from './InlineForm'
+import { CoachAssignForm, CoachEditNameForm } from './InlineForm'
 import TeamInfoForm from './TeamInfoForm'
 import TeamLinksSection from '@/components/TeamLinksSection'
-import { updateTeam, assignCoach, removeCoach, addPlayer, updatePlayer, removePlayer, addTeamLink, removeTeamLink } from '../actions'
+import { updateTeam, assignCoach, removeCoach, updateCoachName, addPlayer, updatePlayer, removePlayer, addTeamLink, removeTeamLink } from '../actions'
 
 export const metadata = { title: 'Team — Admin' }
 
@@ -87,14 +87,18 @@ export default async function TeamDetailPage({
             {coaches.map((ct) => {
               const p = ct.profiles as unknown as { full_name: string; email: string } | null
               const removeAction = removeCoach.bind(null, id, ct.coach_id)
+              const editNameAction = updateCoachName.bind(null, ct.coach_id, id)
               return (
-                <div key={ct.coach_id} className="flex items-center justify-between px-4 py-3 gap-2">
-                  <div>
-                    <p className="text-sm font-semibold text-brand-navy">
-                      {p?.full_name}
-                      {ct.is_head_coach && <span className="ml-2 text-xs text-gray-400">(Head Coach)</span>}
-                    </p>
-                    <p className="text-xs text-gray-500">{p?.email}</p>
+                <div key={ct.coach_id} className="px-4 py-3 flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-semibold text-brand-navy">
+                        {p?.full_name}
+                      </p>
+                      {ct.is_head_coach && <span className="text-xs text-gray-400">(Head Coach)</span>}
+                    </div>
+                    <p className="text-xs text-gray-500 mb-1">{p?.email}</p>
+                    <CoachEditNameForm action={editNameAction} currentName={p?.full_name ?? ''} />
                   </div>
                   <DeleteButton action={removeAction} label="Remove" confirmMessage={`Remove ${p?.full_name} from this team?`} />
                 </div>

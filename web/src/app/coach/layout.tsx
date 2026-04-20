@@ -12,6 +12,7 @@ const navItems = [
   { label: "Post Highlight", href: "/coach/highlights/new" },
   { label: "Messages", href: "/coach/messages" },
   { label: "Contacts", href: "/coach/contact" },
+  { label: "Profile", href: "/coach/profile" },
 ];
 
 export default async function CoachLayout({

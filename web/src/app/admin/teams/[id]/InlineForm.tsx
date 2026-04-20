@@ -36,6 +36,29 @@ export function CoachAssignForm({ action }: { action: ActionFn }) {
   )
 }
 
+export function CoachEditNameForm({ action, currentName }: { action: ActionFn; currentName: string }) {
+  const [error, formAction, isPending] = useActionState(action, null)
+  return (
+    <form action={formAction} className="flex gap-2 items-center mt-1">
+      {error && <p className="text-xs text-red-600 w-full">{error}</p>}
+      <input
+        name="full_name"
+        required
+        defaultValue={currentName}
+        placeholder="Full name"
+        className="border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-brand-navy w-36"
+      />
+      <button
+        type="submit"
+        disabled={isPending}
+        className="px-2 py-1 bg-brand-navy text-white text-xs font-display font-bold uppercase rounded hover:bg-brand-navy-light transition-colors disabled:opacity-50"
+      >
+        {isPending ? '…' : 'Save'}
+      </button>
+    </form>
+  )
+}
+
 export function PlayerAddForm({ action }: { action: ActionFn }) {
   const [error, formAction, isPending] = useActionState(action, null)
   return (

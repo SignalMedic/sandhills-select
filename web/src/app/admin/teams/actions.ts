@@ -137,6 +137,24 @@ export async function removePlayer(teamId: string, playerId: string): Promise<vo
   revalidatePath(`/admin/teams/${teamId}`)
 }
 
+export async function updateCoachName(coachId: string, teamId: string, _prev: string | null, formData: FormData): Promise<string | null> {
+  await requireAdmin()
+  const supabase = await createClient()
+
+  const full_name = (formData.get('full_name') as string).trim()
+  if (!full_name) return 'Name is required.'
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ full_name })
+    .eq('id', coachId)
+
+  if (error) return error.message
+  revalidatePath(`/admin/teams/${teamId}`)
+  revalidatePath('/admin/teams')
+  return null
+}
+
 export async function addTeamLink(teamId: string, _prev: string | null, formData: FormData): Promise<string | null> {
   await requireAdmin()
   const supabase = await createClient()
