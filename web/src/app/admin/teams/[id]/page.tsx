@@ -6,7 +6,8 @@ import PlayerRoster from '@/components/PlayerRoster'
 import DeleteButton from '@/components/DeleteButton'
 import { CoachAssignForm } from './InlineForm'
 import TeamInfoForm from './TeamInfoForm'
-import { updateTeam, assignCoach, removeCoach, addPlayer, updatePlayer, removePlayer } from '../actions'
+import TeamLinksSection from '@/components/TeamLinksSection'
+import { updateTeam, assignCoach, removeCoach, addPlayer, updatePlayer, removePlayer, addTeamLink, removeTeamLink } from '../actions'
 
 export const metadata = { title: 'Team — Admin' }
 
@@ -19,7 +20,7 @@ export default async function TeamDetailPage({
   const { id } = await params
   const supabase = await createClient()
 
-  const [{ data: team }, { data: coaches }, { data: players }] = await Promise.all([
+  const [{ data: team }, { data: coaches }, { data: players }, { data: links }] = await Promise.all([
     supabase.from('teams').select('*').eq('id', id).single(),
     supabase
       .from('coach_teams')
@@ -30,6 +31,12 @@ export default async function TeamDetailPage({
       .select('id, full_name, jersey_number, position, email, phone, team_id')
       .eq('team_id', id)
       .order('jersey_number'),
+    supabase
+      .from('team_links')
+      .select('id, label, url')
+      .eq('team_id', id)
+      .order('sort_order')
+      .order('created_at'),
   ])
 
   if (!team) notFound()
@@ -102,6 +109,16 @@ export default async function TeamDetailPage({
           <p className="text-xs font-display font-bold uppercase tracking-wider text-gray-500 mb-3">Assign Coach</p>
           <CoachAssignForm action={boundAssignCoach} />
         </div>
+      </section>
+
+      {/* Team Links */}
+      <section className="bg-white border border-gray-200 rounded-lg p-6">
+        <h2 className="font-display font-bold text-brand-navy text-lg uppercase mb-4">Team Links</h2>
+        <TeamLinksSection
+          links={(links ?? []) as { id: string; label: string; url: string }[]}
+          addAction={addTeamLink.bind(null, id)}
+          removeAction={removeTeamLink.bind(null, id)}
+        />
       </section>
 
       {/* Roster */}

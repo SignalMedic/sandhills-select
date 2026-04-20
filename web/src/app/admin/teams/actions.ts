@@ -136,3 +136,26 @@ export async function removePlayer(teamId: string, playerId: string): Promise<vo
   if (error) throw new Error(error.message)
   revalidatePath(`/admin/teams/${teamId}`)
 }
+
+export async function addTeamLink(teamId: string, _prev: string | null, formData: FormData): Promise<string | null> {
+  await requireAdmin()
+  const supabase = await createClient()
+
+  const label = (formData.get('label') as string).trim()
+  const url = (formData.get('url') as string).trim()
+  if (!label || !url) return 'Label and URL are required.'
+
+  const { error } = await supabase.from('team_links').insert({ team_id: teamId, label, url })
+  if (error) return error.message
+  revalidatePath(`/admin/teams/${teamId}`)
+  return null
+}
+
+export async function removeTeamLink(teamId: string, linkId: string): Promise<void> {
+  await requireAdmin()
+  const supabase = await createClient()
+
+  const { error } = await supabase.from('team_links').delete().eq('id', linkId)
+  if (error) throw new Error(error.message)
+  revalidatePath(`/admin/teams/${teamId}`)
+}

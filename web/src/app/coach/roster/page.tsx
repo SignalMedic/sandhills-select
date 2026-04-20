@@ -1,7 +1,8 @@
 import { requireCoach } from '@/lib/supabase/auth'
 import { createClient } from '@/lib/supabase/server'
 import PlayerRoster from '@/components/PlayerRoster'
-import { addPlayer, updatePlayer, removePlayer } from './actions'
+import TeamLinksSection from '@/components/TeamLinksSection'
+import { addPlayer, updatePlayer, removePlayer, addTeamLink, removeTeamLink } from './actions'
 
 export const metadata = { title: 'Roster — Coach Portal' }
 
@@ -16,13 +17,31 @@ export default async function CoachRosterPage() {
 
   const teamIds = coachTeams?.map((ct) => ct.team_id) ?? []
 
-  const { data: players } = teamIds.length
-    ? await supabase
-        .from('players')
-        .select('id, full_name, jersey_number, position, email, phone, team_id')
-        .in('team_id', teamIds)
-        .order('jersey_number')
-    : { data: [] }
+  const [{ data: players }, { data: teamLinks }] = await Promise.all([
+    teamIds.length
+      ? supabase
+          .from('players')
+          .select('id, full_name, jersey_number, position, email, phone, team_id')
+          .in('team_id', teamIds)
+          .order('jersey_number')
+      : Promise.resolve({ data: [] }),
+    teamIds.length
+      ? supabase
+          .from('team_links')
+          .select('id, team_id, label, url')
+          .in('team_id', teamIds)
+          .order('sort_order')
+          .order('created_at')
+      : Promise.resolve({ data: [] }),
+  ])
+
+  type LinkRow = { id: string; team_id: string; label: string; url: string }
+  const linksByTeam = (teamLinks ?? []).reduce<Record<string, LinkRow[]>>((acc, l) => {
+    const row = l as unknown as LinkRow
+    if (!acc[row.team_id]) acc[row.team_id] = []
+    acc[row.team_id]!.push(row)
+    return acc
+  }, {})
 
   type PlayerRow = { id: string; full_name: string; jersey_number: string | null; position: string | null; email: string | null; phone: string | null; team_id: string }
   const playersByTeam = (players ?? []).reduce<Record<string, PlayerRow[]>>((acc, p) => {
@@ -69,6 +88,15 @@ export default async function CoachRosterPage() {
                   players={roster}
                   addAction={addPlayer.bind(null, team.id)}
                 />
+
+                <div className="bg-white border border-gray-200 rounded-lg p-6 mt-4">
+                  <h3 className="font-display font-bold text-brand-navy text-base uppercase mb-4">Team Links</h3>
+                  <TeamLinksSection
+                    links={linksByTeam[ct.team_id] ?? []}
+                    addAction={addTeamLink.bind(null, team.id)}
+                    removeAction={removeTeamLink.bind(null, team.id)}
+                  />
+                </div>
               </div>
             )
           })}

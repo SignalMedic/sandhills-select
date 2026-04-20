@@ -14,7 +14,8 @@ export default async function TeamsPage() {
       coach_teams(
         is_head_coach,
         profiles(full_name)
-      )
+      ),
+      team_links(id, label, url)
     `)
     .eq("active", true)
     .order("age_group");
@@ -95,6 +96,21 @@ export default async function TeamsPage() {
                       )}
                       {!headCoach && (!otherCoaches || otherCoaches.length === 0) && (
                         <p className="text-gray-400 text-sm">Coaches TBA</p>
+                      )}
+                      {team.team_links && team.team_links.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+                          {(team.team_links as { id: string; label: string; url: string }[]).map((link) => (
+                            <a
+                              key={link.id}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center px-3 py-1.5 rounded border border-brand-navy text-brand-navy text-xs font-display font-bold uppercase tracking-wider hover:bg-brand-navy hover:text-white transition-colors"
+                            >
+                              {link.label}
+                            </a>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>

@@ -64,3 +64,30 @@ export async function removePlayer(playerId: string, teamId: string): Promise<vo
   if (error) throw new Error(error.message)
   revalidatePath('/coach/roster')
 }
+
+export async function addTeamLink(teamId: string, _prev: string | null, formData: FormData): Promise<string | null> {
+  const profile = await requireCoach()
+  const supabase = await createClient()
+
+  await assertCoachOwnsTeam(profile.id, teamId)
+
+  const label = (formData.get('label') as string).trim()
+  const url = (formData.get('url') as string).trim()
+  if (!label || !url) return 'Label and URL are required.'
+
+  const { error } = await supabase.from('team_links').insert({ team_id: teamId, label, url })
+  if (error) return error.message
+  revalidatePath('/coach/roster')
+  return null
+}
+
+export async function removeTeamLink(teamId: string, linkId: string): Promise<void> {
+  const profile = await requireCoach()
+  const supabase = await createClient()
+
+  await assertCoachOwnsTeam(profile.id, teamId)
+
+  const { error } = await supabase.from('team_links').delete().eq('id', linkId)
+  if (error) throw new Error(error.message)
+  revalidatePath('/coach/roster')
+}
