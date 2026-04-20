@@ -9,9 +9,5 @@
 		"binding": "ASSETS"
 	},
 	"workers_dev": true,
-	"preview_urls": true,
-	"routes": [
-		{ "pattern": "sandhillsselect.us/*", "zone_name": "sandhillsselect.us" },
-		{ "pattern": "www.sandhillsselect.us/*", "zone_name": "sandhillsselect.us" }
-	]
+	"preview_urls": true
 }
