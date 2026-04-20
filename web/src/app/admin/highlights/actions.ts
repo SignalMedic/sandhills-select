@@ -27,7 +27,7 @@ export async function approveHighlight(id: string): Promise<void> {
 
   if (error) throw new Error(error.message)
 
-  const team = highlight?.teams as { name: string } | null
+  const team = highlight?.teams as unknown as { name: string } | null
   const typeLabel = highlight?.type === 'photo' ? 'Photo' : highlight?.type === 'video' ? 'Video' : 'Update'
   const suggestedTitle = team ? `${team.name} — ${typeLabel}` : typeLabel
 
