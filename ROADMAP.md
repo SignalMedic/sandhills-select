@@ -73,82 +73,82 @@ Because this involves minors, admin review before any public or social post is s
 
 ## 1. Public / Visitor-Facing
 
-- **1.1** Homepage — org overview, latest announcements, upcoming events (all CMS-driven)
-- **1.2** Team Directory — list of teams with roster summaries, coach info
-- **1.3** Schedule Board — game/practice schedules per team, filterable by team or date
-- **1.4** Events Page — event listings with details, dates, locations
-- **1.5** Event Registration & Payment — online signup and payment for events (tournaments, tryouts, banquets, etc.)
-- **1.6** Contact Form — visitor can message a specific team's coach(es) or org admins
-- **1.7** News / Announcements Feed — public-facing announcements posted by admins
-- **1.8** Highlights Gallery — approved photos and videos from coaches, filterable by team; embedded social posts optional
+- [x] **1.1** Homepage — org overview, latest announcements, upcoming events (all CMS-driven)
+- [x] **1.2** Team Directory — list of teams with roster summaries, coach info, team links
+- [x] **1.3** Schedule Board — game/practice schedules per team, filterable by team or date
+- [x] **1.4** Events Page — event listings with details, dates, locations
+- [ ] **1.5** Event Registration & Payment — online signup and payment for events (tournaments, tryouts, banquets, etc.)
+- [x] **1.6** Contact Form — visitor can message a specific team's coach(es) or org admins
+- [x] **1.7** News / Announcements Feed — public-facing announcements posted by admins
+- [x] **1.8** Highlights Gallery — approved photos and videos from coaches, filterable by team; embedded social posts optional
 
 ---
 
 ## 2. Organization Admin Features
 
-- **2.1** Admin Dashboard — overview of org activity, pending items, revenue
-- **2.2** Announcement Publisher — rich text editor, image upload, publish immediately or schedule
-- **2.3** Event Manager — create events, set registration limits, pricing tiers, deadlines; no code required
-- **2.4** Payment Dashboard — view event registrations, payment status, export reports
-- **2.5** Schedule Manager — add/edit games and practices per team; visible on public schedule board immediately
-- **2.6** Team Management — create teams, assign coaches, manage rosters
-- **2.7** User & Role Management — manage coach accounts, admin accounts, permissions
-- **2.8** Messaging Inbox — receive and reply to contact form messages
-- **2.9** Reimbursement Approval Queue — review pending submissions with receipt image, amount, category, and coach notes; approve or deny with one tap
-- **2.10** Batch Approval — select and approve multiple reimbursement submissions at once for efficiency
-- **2.11** Reimbursement Ledger — full history of all reimbursements by coach, team, date, category, and status (pending, approved, paid, denied)
-- **2.12** Denial with Reason — when denying a reimbursement, admin provides a reason that is sent to the coach automatically
-- **2.13** Spending Limits — optional per-team or per-category budget caps; system flags submissions that would exceed limits
-- **2.14** Notification Blasts — push/email/SMS announcements to coaches or families
-- **2.15** Draft / Preview Mode — admins can preview an announcement or event before publishing
-- **2.16** Reimbursement Export — export ledger to CSV or PDF for bookkeeping and non-profit reporting
-- **2.17** Highlights Approval Queue — review coach-submitted highlights before they publish; edit caption, approve or reject
-- **2.18** Social Media Account Manager — connect and manage the org's Facebook, Instagram, and X accounts from one settings page
-- **2.19** Per-Platform Post Control — when approving a highlight, choose which platforms to post to (website only, Instagram, Facebook, X, or all)
+- [x] **2.1** Admin Dashboard — overview of org activity, pending items, revenue
+- [x] **2.2** Announcement Publisher — rich text editor, image upload, publish immediately or schedule
+- [x] **2.3** Event Manager — create events, set registration limits, pricing tiers, deadlines; no code required
+- [ ] **2.4** Payment Dashboard — view event registrations, payment status, export reports
+- [x] **2.5** Schedule Manager — add/edit games and practices per team; visible on public schedule board immediately
+- [x] **2.6** Team Management — create teams, assign coaches (with inline name editing), manage rosters, manage team links
+- [ ] **2.7** User & Role Management — manage coach accounts, admin accounts, permissions
+- [x] **2.8** Messaging Inbox — receive and reply to contact form messages
+- [x] **2.9** Reimbursement Approval Queue — review pending submissions with receipt image, amount, category, and coach notes; approve or deny with one tap
+- [ ] **2.10** Batch Approval — select and approve multiple reimbursement submissions at once for efficiency
+- [x] **2.11** Reimbursement Ledger — full history with filters (status, team, date range), summary cards, team and category breakdowns
+- [x] **2.12** Denial with Reason — when denying a reimbursement, admin provides a reason visible to the coach
+- [ ] **2.13** Spending Limits — optional per-team or per-category budget caps; system flags submissions that would exceed limits
+- [ ] **2.14** Notification Blasts — push/email/SMS announcements to coaches or families
+- [x] **2.15** Draft / Preview Mode — announcements and events have draft status before publishing
+- [x] **2.16** Reimbursement Export — ZIP export with CSV ledger + all receipt images, respects active filters
+- [x] **2.17** Highlights Approval Queue — review coach-submitted highlights before they publish; edit caption, approve or reject
+- [ ] **2.18** Social Media Account Manager — connect and manage the org's Facebook, Instagram, and X accounts from one settings page
+- [ ] **2.19** Per-Platform Post Control — when approving a highlight, choose which platforms to post to (website only, Instagram, Facebook, X, or all)
 
 ---
 
 ## 3. Coach Features
 
-- **3.1** Coach Dashboard — team schedule, pending items, messages
-- **3.2** Roster View — view their team's players and contact info
-- **3.3** Bank Account Setup — one-time secure onboarding via Stripe to link direct deposit account
-- **3.4** Receipt Submission — photograph receipt, confirm auto-filled amount and merchant (OCR-assisted), select expense category, add notes, submit
-- **3.5** Multi-Receipt Request — group multiple receipts into a single reimbursement request (e.g., one tournament trip)
-- **3.6** Reimbursement History — full status history per submission: submitted, under review, approved, paid, or denied with reason
-- **3.7** Highlight Submission — post a photo, video, or text highlight; tag a player or team; add a caption; submit for admin review
-- **3.8** Highlight History — view status of submitted highlights (pending, approved and posted, rejected with reason)
-- **3.9** Schedule Visibility — view and confirm their team's schedule
-- **3.10** Messaging — receive and reply to visitor messages routed to their team
+- [x] **3.1** Coach Dashboard — team schedule, pending items, messages
+- [x] **3.2** Roster View — view and edit their team's players and contact info; manage team links
+- [ ] **3.3** Bank Account Setup — one-time secure onboarding via Stripe to link direct deposit account
+- [x] **3.4** Receipt Submission — photograph receipt, select expense category, add notes, submit
+- [x] **3.5** Multi-Receipt Request — group multiple receipts into a single reimbursement request
+- [x] **3.6** Reimbursement History — full status history; can edit and resubmit after denial
+- [x] **3.7** Highlight Submission — post a photo, video, or text highlight; add a caption; submit for admin review
+- [x] **3.8** Highlight History — view status of submitted highlights (pending, approved, rejected with reason)
+- [x] **3.9** Schedule Visibility — view their team's upcoming schedule
+- [x] **3.10** Messaging — receive and reply to visitor messages routed to their team
 
 ---
 
 ## 4. Mobile App (Companion — iOS & Android)
 
-- **4.1** Coach Login — secure auth, role-based access
-- **4.2** Receipt Capture — in-app camera with auto-crop and image enhancement for legibility
-- **4.3** OCR Pre-fill — app reads merchant name and total amount from receipt photo; coach confirms or corrects before submitting
-- **4.4** Expense Submission — confirm amount, select category (meals, fuel, lodging, equipment, entry fees, etc.), add notes, attach to a trip/event, submit
-- **4.5** Multi-Receipt Bundling — attach multiple photos to one reimbursement request
-- **4.6** Submission Status Tracker — real-time status per request (submitted → under review → approved → paid); push notification at each stage
-- **4.7** Highlight Creator — select photo or video from camera roll or capture in-app; add caption; tag player(s), team, or event; submit for review
-- **4.8** Highlight Status Feed — see whether submitted highlights are pending, approved and live, or rejected with admin note
-- **4.9** Schedule View — personal team schedule with calendar sync option
-- **4.10** Announcement Feed — org announcements in-app (pulled from CMS)
-- **4.11** Messaging — in-app chat or message thread with admins
+- [ ] **4.1** Coach Login — secure auth, role-based access
+- [ ] **4.2** Receipt Capture — in-app camera with auto-crop and image enhancement for legibility
+- [ ] **4.3** OCR Pre-fill — app reads merchant name and total amount from receipt photo; coach confirms or corrects before submitting
+- [ ] **4.4** Expense Submission — confirm amount, select category (meals, fuel, lodging, equipment, entry fees, etc.), add notes, attach to a trip/event, submit
+- [ ] **4.5** Multi-Receipt Bundling — attach multiple photos to one reimbursement request
+- [ ] **4.6** Submission Status Tracker — real-time status per request (submitted → under review → approved → paid); push notification at each stage
+- [ ] **4.7** Highlight Creator — select photo or video from camera roll or capture in-app; add caption; tag player(s), team, or event; submit for review
+- [ ] **4.8** Highlight Status Feed — see whether submitted highlights are pending, approved and live, or rejected with admin note
+- [ ] **4.9** Schedule View — personal team schedule with calendar sync option
+- [ ] **4.10** Announcement Feed — org announcements in-app (pulled from CMS)
+- [ ] **4.11** Messaging — in-app chat or message thread with admins
 
 ---
 
 ## 5. Shared / Infrastructure
 
-- **5.1** Authentication & Roles — visitor, coach, admin, super-admin
-- **5.2** Email Notifications — registration confirmations, receipt status updates, new messages
-- **5.3** Push Notifications — mobile app alerts for approvals, announcements, schedule changes, highlight post confirmations
-- **5.4** Payment Processing — Stripe for inbound payments (event fees, dues); Stripe Connect for outbound reimbursements (ACH direct deposit to coaches)
-- **5.5** File / Image Storage — receipt images, highlight photos/videos, gallery media, documents
-- **5.6** Audit Log — track who approved what, when
-- **5.7** Headless CMS — admin studio for no-code content management (Sanity or Payload CMS recommended)
-- **5.8** Role-gated CMS Access — admins can publish; coaches have read-only or limited access
-- **5.9** Social Media API Integrations — Meta Graph API (Facebook + Instagram), X API; OAuth-based account connection managed by super-admin
-- **5.10** Video Storage & Transcoding — uploaded highlight videos need compression and format conversion before web and social delivery (recommend Cloudflare Stream or Mux)
-- **5.11** Transactional Email (SMTP) — current Supabase auth emails (invites, password reset) use Supabase's default sender which has low deliverability and no branding; integrate a dedicated SMTP provider (recommended: Resend or Postmark) for all transactional email — invites, password resets, reimbursement status updates, and announcement blasts; configure custom domain sending (e.g., noreply@sandhillsselect.com)
+- [x] **5.1** Authentication & Roles — visitor, coach, admin, super-admin
+- [ ] **5.2** Email Notifications — registration confirmations, receipt status updates, new messages
+- [ ] **5.3** Push Notifications — mobile app alerts for approvals, announcements, schedule changes, highlight post confirmations
+- [ ] **5.4** Payment Processing — Stripe for inbound payments (event fees, dues); Stripe Connect for outbound reimbursements (ACH direct deposit to coaches)
+- [x] **5.5** File / Image Storage — receipt images, highlight photos/videos via Supabase Storage
+- [ ] **5.6** Audit Log — track who approved what, when
+- [ ] **5.7** Headless CMS — admin studio for no-code content management (Sanity or Payload CMS recommended)
+- [ ] **5.8** Role-gated CMS Access — admins can publish; coaches have read-only or limited access
+- [ ] **5.9** Social Media API Integrations — Meta Graph API (Facebook + Instagram), X API; OAuth-based account connection managed by super-admin
+- [ ] **5.10** Video Storage & Transcoding — uploaded highlight videos need compression and format conversion before web and social delivery (recommend Cloudflare Stream or Mux)
+- [ ] **5.11** Transactional Email (SMTP) — current Supabase auth emails (invites, password reset) use Supabase's default sender which has low deliverability and no branding; integrate a dedicated SMTP provider (recommended: Resend or Postmark) for all transactional email — invites, password resets, reimbursement status updates, and announcement blasts; configure custom domain sending (e.g., noreply@sandhillsselect.com)
